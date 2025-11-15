@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: angular
+    ports:
+      - "4000:4000"
+    depends_on:
+      - backend
+    networks:
+      - ponte-network
+
+  backend:
+    build: ./backend
+    container_name: django-api
+    command: >
+      sh -c "sh ./wait-for-db.sh &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+      - "8080:8000"
+    environment:
+      - DB_NAME=ponte_db
+      - DB_USER=ponte_user
+      - DB_PASSWORD=ponte_pass
+      - DB_HOST=db
+    depends_on:
+      - db
+    networks:
+      - ponte-network
+
+  db:
+    image: mysql:8.0
+    container_name: ponte-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ponte_db
+      MYSQL_USER: ponte_user
+      MYSQL_PASSWORD: ponte_pass
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - ponte-network
+
+volumes:
+  db_data:
+
+networks:
+  ponte-network:
+    driver: bridge

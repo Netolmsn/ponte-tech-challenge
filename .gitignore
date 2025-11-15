@@ -1,0 +1,37 @@
+# VSCode settings
+your_project/.vscode/
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/.angular/cache/
+
+# Python
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/env/
+backend/venv/
+backend/.venv/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+*.env
+.env
+
+# Docker
+docker-compose.override.yml
+*.pid
+*.seed
+*.tar
+docker-data/
+
+

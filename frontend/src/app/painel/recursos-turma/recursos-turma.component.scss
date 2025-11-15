@@ -1,0 +1,59 @@
+.container {
+  padding: 20px;
+}
+
+mat-card {
+  width: 80%;
+  margin: 2em auto;
+}
+
+.loading-spinner, .empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-style: italic;
+  color: #666;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  width: 80%;
+  margin: 0 auto 1em auto;
+  font-size: 14px;
+  color: #555;
+
+  a {
+    color: purple;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.recurso-item {
+  height: auto !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 15px 0;
+}
+
+.video-player {
+  width: 100%;
+  padding: 15px 0;
+  max-width: 640px;
+}
+
+::ng-deep .recurso-item .mdc-list-item__end {
+  align-self: flex-start;
+  padding-top: 10px;
+}

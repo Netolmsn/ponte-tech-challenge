@@ -1,0 +1,61 @@
+<div class="container">
+  <mat-card class="mat-elevation-z8">
+    @if (treinamentos$ | async; as treinamento) {
+    <mat-toolbar>
+      <span class="toolbar-title">Treinamentos Disponíveis</span>
+      <span class="spacer"></span>
+      <button
+        mat-fab
+        color="accent"
+        aria-label="Adicionar Treinamento"
+        (click)="onAdd()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <table mat-table [dataSource]="treinamento">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let treinamento">{{ treinamento.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="descricao">
+        <th mat-header-cell *matHeaderCellDef>Descrição</th>
+        <td mat-cell *matCellDef="let treinamento">
+          {{ treinamento.descricao }}
+          <mat-icon
+            [ngClass]="
+              treinamento.descricao === 'front-end'
+                ? 'front-end-icon'
+                : 'back-end-icon'
+            "
+          >
+          {{ treinamento.descricao }}
+        </mat-icon>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Ações</th>
+        <td mat-cell *matCellDef="let treinamento">
+          <button mat-icon-button color="primary" (click)="onEdit(treinamento)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="onDelete(treinamento)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    } @else {
+    <div class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+    }
+  </mat-card>
+</div>
