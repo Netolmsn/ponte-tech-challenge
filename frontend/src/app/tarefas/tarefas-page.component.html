@@ -1,0 +1,132 @@
+<div class="tarefas-page">
+  <mat-card>
+    <h2>Dashboard</h2>
+    <div *ngIf="dashboard">
+      <p>Total de tarefas: {{ dashboard.total }}</p>
+      <ul>
+        <li *ngFor="let key of (dashboard.por_status | keyvalue)">
+          {{ key.key }}: {{ key.value }}
+        </li>
+      </ul>
+    </div>
+  </mat-card>
+
+  <mat-card>
+    <h2>Filtros</h2>
+    <div class="filtros">
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select
+          [value]="filtroStatus"
+          (selectionChange)="filtroStatus = $event.value"
+        >
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option value="PENDENTE">Pendente</mat-option>
+          <mat-option value="EM_ANDAMENTO">Em Progresso</mat-option>
+          <mat-option value="CONCLUIDA">Concluída</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Prioridade</mat-label>
+        <mat-select
+          [value]="filtroPrioridade"
+          (selectionChange)="filtroPrioridade = $event.value"
+        >
+          <mat-option [value]="null">Todas</mat-option>
+          <mat-option value="BAIXA">Baixa</mat-option>
+          <mat-option value="MEDIA">Média</mat-option>
+          <mat-option value="ALTA">Alta</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="aplicarFiltros()">
+        Aplicar
+      </button>
+      <button mat-button (click)="limparFiltros()">Limpar</button>
+    </div>
+  </mat-card>
+
+  <mat-card>
+    <h2>{{ editingId ? 'Editar tarefa' : 'Nova tarefa' }}</h2>
+
+    <form [formGroup]="tarefaForm" (ngSubmit)="salvar()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="titulo" />
+        <mat-error *ngIf="tarefaForm.get('titulo')?.invalid">
+          Título deve ter entre 3 e 100 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descrição</mat-label>
+        <textarea matInput rows="3" formControlName="descricao"></textarea>
+        <mat-error *ngIf="tarefaForm.get('descricao')?.invalid">
+          Descrição deve ter entre 10 e 500 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="PENDENTE">Pendente</mat-option>
+            <mat-option value="EM_ANDAMENTO">Em Progresso</mat-option>
+            <mat-option value="CONCLUIDA">Concluída</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Prioridade</mat-label>
+          <mat-select formControlName="prioridade">
+            <mat-option value="BAIXA">Baixa</mat-option>
+            <mat-option value="MEDIA">Média</mat-option>
+            <mat-option value="ALTA">Alta</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" type="submit">
+        {{ editingId ? 'Salvar alterações' : 'Criar tarefa' }}
+      </button>
+      <button
+        *ngIf="editingId"
+        mat-button
+        type="button"
+        (click)="cancelarEdicao()"
+      >
+        Cancelar
+      </button>
+    </form>
+  </mat-card>
+
+  <mat-card>
+    <h2>Minhas tarefas</h2>
+
+    <mat-list>
+      <mat-list-item *ngFor="let tarefa of tarefas">
+        <div class="tarefa-item">
+          <div class="tarefa-info">
+            <h3>{{ tarefa.titulo }}</h3>
+            <p>{{ tarefa.descricao }}</p>
+            <small>
+              Status: {{ tarefa.status }} |
+              Prioridade: {{ tarefa.prioridade }} |
+              Criada em: {{ tarefa.criado_em | date: 'short' }}
+            </small>
+          </div>
+
+          <div class="tarefa-actions">
+            <button mat-icon-button color="primary" (click)="editar(tarefa)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="excluir(tarefa)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
+</div>

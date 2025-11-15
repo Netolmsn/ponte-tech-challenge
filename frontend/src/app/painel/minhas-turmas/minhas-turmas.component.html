@@ -1,0 +1,38 @@
+<div class="container">
+  <mat-card class="mat-elevation-z8">
+    <mat-card-header>
+      <mat-card-title>Minhas Turmas</mat-card-title>
+    </mat-card-header>
+
+    @if (turmas$ | async; as turmas) {
+      @if (turmas.length > 0) {
+        <mat-list>
+          @for (turma of turmas; track turma.id) {
+            <mat-list-item>
+              <mat-icon matListItemIcon>school</mat-icon>
+              <div matListItemTitle>{{ turma.treinamento?.nome }}</div>
+              <div matListItemLine>Turma: {{ turma.nome }}</div>
+              <div matListItemLine>
+                De: {{ turma.data_inicio | date:'dd/MM/yyyy' }}
+                Até: {{ turma.data_fim | date:'dd/MM/yyyy' }}
+              </div>
+              <div matListItemMeta>
+                <button mat-flat-button color="primary" [routerLink]="['/painel/turma', turma.id]">
+                  Acessar Recursos
+                </button>
+              </div>
+            </mat-list-item>
+          }
+        </mat-list>
+      } @else {
+        <div class="empty-state">
+          <span>Você ainda não está matriculado em nenhuma turma.</span>
+        </div>
+      }
+    } @else {
+      <div class="loading-spinner">
+        <mat-spinner></mat-spinner>
+      </div>
+    }
+  </mat-card>
+</div>

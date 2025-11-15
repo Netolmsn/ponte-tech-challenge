@@ -1,0 +1,23 @@
+.container {
+  padding: 20px;
+}
+
+mat-card {
+  width: 80%;
+  margin: 2em auto;
+}
+
+.loading-spinner, .empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-style: italic;
+  color: #666;
+}
+
+mat-list-item {
+  height: auto !important;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}

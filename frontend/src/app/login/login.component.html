@@ -1,0 +1,47 @@
+<div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+  <mat-card style="width: 400px;">
+    <mat-card-header>
+      <mat-card-title>Login</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>E-mail</mat-label>
+          <input matInput formControlName="email" required />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            E-mail é obrigatório
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            E-mail inválido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Senha</mat-label>
+          <input matInput type="password" formControlName="password" required />
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Senha é obrigatória
+          </mat-error>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="loginForm.invalid"
+          style="width: 100%;"
+        >
+          Entrar
+        </button>
+      </form>
+
+      <div
+        *ngIf="errorMessage"
+        style="color: red; margin-top: 10px; text-align: center;"
+      >
+        {{ errorMessage }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+

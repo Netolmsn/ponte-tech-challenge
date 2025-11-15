@@ -1,0 +1,112 @@
+[
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1a",
+    "name": "Desenvolvimento Web com Angular",
+    "category": "Frontend"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1b",
+    "name": "Introdução ao Node.js e Express",
+    "category": "Backend"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1c",
+    "name": "Banco de Dados NoSQL com MongoDB",
+    "category": "Database"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1d",
+    "name": "Python para Ciência de Dados",
+    "category": "DataScience"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1e",
+    "name": "Design de UI/UX para Iniciantes",
+    "category": "Design"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d1f",
+    "name": "Testes Automatizados com Jest",
+    "category": "QA"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d20",
+    "name": "DevOps com Docker e Kubernetes",
+    "category": "DevOps"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d21",
+    "name": "Fundamentos de Cloud Computing AWS",
+    "category": "Cloud"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d22",
+    "name": "Desenvolvimento Mobile com React Native",
+    "category": "Mobile"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d23",
+    "name": "Marketing Digital para Desenvolvedores",
+    "category": "Marketing"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d24",
+    "name": "Segurança da Informação",
+    "category": "Security"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d25",
+    "name": "Inteligência Artificial com TensorFlow",
+    "category": "AIML"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d26",
+    "name": "Gestão de Projetos Ágeis (Scrum)",
+    "category": "Management"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d27",
+    "name": "Criação de APIs RESTful com Spring Boot",
+    "category": "Backend"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d28",
+    "name": "Blockchain e Criptomoedas",
+    "category": "Blockchain"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d29",
+    "name": "Realidade Virtual e Aumentada",
+    "category": "EmergingTech"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2a",
+    "name": "Análise de Dados com R",
+    "category": "DataScience"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2b",
+    "name": "Microserviços com .NET Core",
+    "category": "Backend"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2c",
+    "name": "Introdução à Robótica",
+    "category": "Hardware"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2d",
+    "name": "Game Development com Unity",
+    "category": "GameDev"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2e",
+    "name": "Programação Funcional em JavaScript",
+    "category": "Frontend"
+  },
+  {
+    "_id": "60c72b2f9c3b1e001c8a4d2f",
+    "name": "Estruturas de Dados e Algoritmos",
+    "category": "ComputerScience"
+  }
+]
