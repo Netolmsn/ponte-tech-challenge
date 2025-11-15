@@ -1,13 +1,18 @@
 from django.contrib.auth.models import User
 from django.db.models import Count
-from rest_framework import status, viewsets
+from rest_framework import serializers, status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Tarefa
-from .serializers import TarefaSerializer, UsuarioRegisterSerializer
+from .serializers import (
+    TarefaSerializer,
+    UserSerializer,
+    UsuarioPerfilSerializer,
+    UsuarioRegisterSerializer,
+)
 
 
 class RegisterView(APIView):
@@ -27,21 +32,16 @@ class RegisterView(APIView):
         )
 
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    class LoginSerializer(APIView.serializer_class.__class__):  # type: ignore
-        email = None
-        password = None
-
     def post(self, request):
-        from rest_framework import serializers
-
-        class _LoginSerializer(serializers.Serializer):
-            email = serializers.EmailField()
-            password = serializers.CharField(write_only=True, trim_whitespace=False)
-
-        serializer = _LoginSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
         password = serializer.validated_data["password"]
@@ -67,10 +67,30 @@ class LoginView(APIView):
             )
 
         refresh = RefreshToken.for_user(user)
+        # Garantir que o token contenha id e e-mail conforme escopo
+        refresh["id"] = user.id
+        refresh["email"] = user.email
+
         return Response(
             {
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
+            }
+        )
+
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        perfil = getattr(user, "perfil", None)
+        return Response(
+            {
+                "user": UserSerializer(user).data,
+                "perfil": (
+                    UsuarioPerfilSerializer(perfil).data if perfil else None
+                ),
             }
         )
 

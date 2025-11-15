@@ -12,15 +12,15 @@ interface AuthResponse {
 
 export interface UserDto {
   id: number;
-  username: string;
   email: string;
+  username: string;
   first_name: string;
   last_name: string;
 }
 
 export interface MeResponse {
   user: UserDto;
-  aluno: any | null;
+  perfil: { id: number; nome: string } | null;
 }
 
 @Injectable({
@@ -48,8 +48,8 @@ export class AuthService {
     return !!localStorage.getItem('access_token') && !!localStorage.getItem('refresh_token');
   }
 
-  login(credentials: { username: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/token/`, credentials).pipe(
+  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials).pipe(
       tap((tokens) => this.storeTokens(tokens)),
       tap(() => this._isAuthenticated.set(true)),
       switchMap((tokens) =>

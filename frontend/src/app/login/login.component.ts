@@ -31,7 +31,7 @@ export class LoginComponent {
   private snackBar = inject(MatSnackBar);
 
   loginForm = this.fb.group({
-    username: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
 
@@ -39,10 +39,10 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.authService.login({ username: username!, password: password! }).subscribe({
+      const { email, password } = this.loginForm.value;
+      this.authService.login({ email: email!, password: password! }).subscribe({
         next: () => {
-          this.router.navigate(['/painel']);
+          this.router.navigate(['/tarefas']);
         },
         error: (err) => {
           this.errorMessage = 'Falha no login. Verifique suas credenciais.';

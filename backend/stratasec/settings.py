@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'treinamentos.apps.TreinamentosConfig',
-    'usuarios.apps.UsuariosConfig',
     'tarefas.apps.TarefasConfig',
 ]
 

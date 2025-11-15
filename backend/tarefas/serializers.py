@@ -5,6 +5,12 @@ from rest_framework import serializers
 from .models import Tarefa, UsuarioPerfil
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name"]
+
+
 class UsuarioPerfilSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioPerfil
@@ -16,12 +22,24 @@ class UsuarioRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
 
-    def validate_email(self, value):
+    def validate_nome(self, value: str) -> str:
+        if len(value.strip()) < 3:
+            raise serializers.ValidationError(
+                "Nome deve ter pelo menos 3 caracteres."
+            )
+        return value
+
+    def validate_email(self, value: str) -> str:
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("E-mail já cadastrado.")
         return value
 
-    def validate_password(self, value):
+    def validate_password(self, value: str) -> str:
+        # regras básicas: mínimo 8 caracteres (campo já força) e pelo menos 1 letra e 1 número
+        if not any(c.isalpha() for c in value) or not any(c.isdigit() for c in value):
+            raise serializers.ValidationError(
+                "A senha deve conter ao menos 1 letra e 1 número."
+            )
         validate_password(value)
         return value
 
@@ -58,6 +76,27 @@ class TarefaSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         instance = self.instance
+
+        # validações de campos de texto conforme escopo
+        titulo = attrs.get("titulo")
+        descricao = attrs.get("descricao")
+
+        # em criação, DRF já vai exigir esses campos; aqui garantimos tamanho
+        if titulo is not None:
+            titulo_limpo = titulo.strip()
+            if not (3 <= len(titulo_limpo) <= 100):
+                raise serializers.ValidationError(
+                    {"titulo": "Título deve ter entre 3 e 100 caracteres."}
+                )
+
+        if descricao is not None:
+            descricao_limpa = descricao.strip()
+            if not (10 <= len(descricao_limpa) <= 500):
+                raise serializers.ValidationError(
+                    {"descricao": "Descrição deve ter entre 10 e 500 caracteres."}
+                )
+
+        # validação de fluxo de status
         new_status = attrs.get("status")
 
         if instance and new_status and new_status != instance.status:
@@ -66,16 +105,16 @@ class TarefaSerializer(serializers.ModelSerializer):
                 Tarefa.Status.PENDENTE: {
                     Tarefa.Status.PENDENTE,
                     Tarefa.Status.EM_ANDAMENTO,
-                    Tarefa.Status.CANCELADA,
+                    Tarefa.Status.CONCLUIDA,
                 },
                 Tarefa.Status.EM_ANDAMENTO: {
                     Tarefa.Status.EM_ANDAMENTO,
                     Tarefa.Status.CONCLUIDA,
-                    Tarefa.Status.CANCELADA,
                 },
                 Tarefa.Status.CONCLUIDA: {
                     Tarefa.Status.CONCLUIDA,
                 },
+                # CANCELADA não faz parte do fluxo obrigatório, mas se usada é final
                 Tarefa.Status.CANCELADA: {
                     Tarefa.Status.CANCELADA,
                 },
