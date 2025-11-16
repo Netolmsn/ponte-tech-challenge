@@ -1,7 +1,8 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from './auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (
@@ -10,6 +11,7 @@ export const authInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<any>> => {
 
   const authService = inject(AuthService);
+  const snackBar = inject(MatSnackBar);
   const accessToken = authService.getAccessToken();
 
   const isAuthEndpoint = req.url.includes('/auth/token');
@@ -26,18 +28,23 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !authReq.url.includes('/auth/token') && !authReq.url.includes('/auth/token/refresh')) {
-        return handle401Error(authReq, next, authService);
+      if (
+        error.status === 401 &&
+        !authReq.url.includes('/auth/token') &&
+        !authReq.url.includes('/auth/token/refresh')
+      ) {
+        return handle401Error(authReq, next, authService, snackBar);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
 
 const handle401Error = (
     req: HttpRequest<any>,
     next: HttpHandlerFn,
-    authService: AuthService
+    authService: AuthService,
+    snackBar: MatSnackBar,
   ): Observable<HttpEvent<any>> => {
 
     return authService.refreshToken().pipe(
@@ -54,6 +61,11 @@ const handle401Error = (
          }
        }),
        catchError((refreshError) => {
+         snackBar.open(
+           'Sua sessão expirou. Faça login novamente.',
+           'Fechar',
+           { duration: 4000 },
+         );
          authService.logout();
          return throwError(() => refreshError);
        })

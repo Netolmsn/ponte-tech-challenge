@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instala dependǦncias do sistema necessǭrias para compilar mysqlclient
+# Instala dependencias do sistema necessarias para compilar mysqlclient
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     pkg-config \

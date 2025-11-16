@@ -1,12 +1,11 @@
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-import { provideServerRendering, withRoutes } from '@angular/ssr';
-import { appConfig } from './app.config';
-import { serverRoutes } from './app.routes.server';
+import { ApplicationConfig, mergeApplicationConfig } from '@angular/core';
 
+import { appConfig } from './app.config';
+
+// Configuração de servidor sem depender de @angular/ssr,
+// evitando erros em builds e testes quando o pacote não está instalado.
 const serverConfig: ApplicationConfig = {
-  providers: [
-    provideServerRendering(withRoutes(serverRoutes))
-  ]
+  providers: [],
 };
 
 export const config = mergeApplicationConfig(appConfig, serverConfig);

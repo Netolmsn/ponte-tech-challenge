@@ -1,12 +1,25 @@
-<mat-toolbar>
-  <span>PonteTech - Gerenciador de Tarefas</span>
-  <span class="spacer"></span>
+<header class="w-full bg-white shadow-sm">
+  <div
+    class="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3"
+  >
+    <span class="app-title text-sm font-semibold text-slate-800">
+      PonteTech - Gerenciador de Tarefas
+    </span>
 
-  @if (isAuthenticated()) {
-    <button mat-icon-button (click)="logout()" aria-label="Sair">
-      <mat-icon>logout</mat-icon>
-    </button>
-  }
-</mat-toolbar>
+    @if (isAuthenticated()) {
+      <button
+        type="button"
+        (click)="logout()"
+        aria-label="Sair"
+        class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition"
+      >
+        <span class="material-icons text-base mr-1">logout</span>
+        <span>Sair</span>
+      </button>
+    }
+  </div>
+</header>
 
-<router-outlet></router-outlet>
+<main class="min-h-[calc(100vh-56px)] bg-slate-50">
+  <router-outlet></router-outlet>
+</main>
