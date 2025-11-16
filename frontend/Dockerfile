@@ -12,6 +12,7 @@ WORKDIR /app
 COPY --from=builder /app/dist/angular ./dist/angular
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/server.cjs ./server.cjs
 
 EXPOSE 4000
-CMD ["node", "dist/angular/server/server.mjs"]
+CMD ["node", "server.cjs"]

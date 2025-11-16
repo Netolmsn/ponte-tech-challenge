@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db.models import Count
+from django.db.models import Count, Q
 from rest_framework import serializers, status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -105,12 +105,18 @@ class TarefaViewSet(viewsets.ModelViewSet):
         status_param = self.request.query_params.get("status")
         prioridade_param = self.request.query_params.get("prioridade")
         ordering = self.request.query_params.get("ordering")
+        search = self.request.query_params.get("search")
 
         if status_param:
             queryset = queryset.filter(status=status_param)
 
         if prioridade_param:
             queryset = queryset.filter(prioridade=prioridade_param)
+
+        if search:
+            queryset = queryset.filter(
+                Q(titulo__icontains=search) | Q(descricao__icontains=search)
+            )
 
         if ordering in ("criado_em", "-criado_em"):
             queryset = queryset.order_by(ordering)
@@ -140,4 +146,3 @@ class DashboardView(APIView):
                 "por_status": {item["status"]: item["total"] for item in por_status},
             }
         )
-

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
@@ -8,10 +9,20 @@ from rest_framework_simplejwt.views import (
 
 from tarefas.views import DashboardView, LoginView, MeView, RegisterView, TarefaViewSet
 
+
+def root_redirect(_request):
+  """
+  Redireciona a raiz da API para a tela de login do frontend.
+  Em ambiente local, o frontend roda em http://localhost:4000/login.
+  """
+  return redirect("http://localhost:4000/login")
+
+
 router = DefaultRouter()
 router.register(r"tarefas", TarefaViewSet, basename="tarefa")
 
 urlpatterns = [
+    path("", root_redirect, name="root_redirect"),
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),

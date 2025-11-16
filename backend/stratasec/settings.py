@@ -85,6 +85,15 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD', 'ponte_pass'),
         'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': os.environ.get('DB_PORT', '3306'),
+        # Em ambientes como este desafio, o usuário de banco
+        # não tem permissão para criar novas databases. Esta
+        # configuração faz com que os testes reutilizem o
+        # próprio ponte_db em vez de tentar criar test_ponte_db,
+        # e não tenta criar/apagar o banco automaticamente.
+        'TEST': {
+            'NAME': os.environ.get('DB_NAME', 'ponte_db'),
+            'CREATE_DB': False,
+        },
     }
 }
 
@@ -139,6 +148,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'stratasec.pagination.DefaultPagination',
 }
 
 from datetime import timedelta
@@ -169,3 +179,4 @@ else:
 
 # Se precisar enviar cookies (não usado com Bearer tokens)
 # CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True

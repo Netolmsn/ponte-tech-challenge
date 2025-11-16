@@ -1,10 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 
@@ -13,15 +9,7 @@ import { AuthService } from '../core/auth/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSnackBarModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatSnackBarModule],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -32,24 +20,39 @@ export class LoginComponent {
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    rememberMe: [false],
   });
 
   errorMessage: string | null = null;
+  hidePassword = true;
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      this.authService.login({ email: email!, password: password! }).subscribe({
-        next: () => {
-          this.router.navigate(['/tarefas']);
-        },
-        error: (err) => {
-          this.errorMessage = 'Falha no login. Verifique suas credenciais.';
-          this.snackBar.open(this.errorMessage, 'Fechar', { duration: 3000 });
-          console.error('Login error:', err);
-        },
-      });
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.errorMessage = 'Preencha os campos obrigatórios corretamente.';
+      this.snackBar.open(this.errorMessage, 'Fechar', { duration: 3000 });
+      return;
     }
+
+    const { email, password } = this.loginForm.value;
+    this.authService.login({ email: email!, password: password! }).subscribe({
+      next: () => {
+        this.router.navigate(['/tarefas']);
+      },
+      error: (err) => {
+        this.errorMessage = 'Falha no login. Verifique suas credenciais.';
+        this.snackBar.open(this.errorMessage, 'Fechar', { duration: 3000 });
+        console.error('Login error:', err);
+      },
+    });
+  }
+
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
+  goToBackendLogin(): void {
+    window.location.href = 'http://localhost:8080/admin/login/';
   }
 }
