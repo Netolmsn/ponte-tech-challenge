@@ -110,7 +110,7 @@ Campos:
 
 - `titulo` (3 a 100 caracteres);
 - `descricao` (10 a 500 caracteres);
-- `status` (opcional, padrǜo PENDENTE);
+- `status` (opcional, padrão PENDENTE);
 - `prioridade` (opcional, padrǜo MEDIA).
 
 **GET /api/tarefas/<id>/**  
@@ -123,7 +123,7 @@ Atualiza título, descrição, status e prioridade, respeitando as regras de val
 Atualização parcial (utilizada principalmente para alterar apenas status na tela de detalhes).
 
 **DELETE /api/tarefas/<id>/**  
-Exclui tarefa do usuǭrio autenticado (comentǭrios relacionados sǜo removidos em cascata).
+Exclui tarefa do usuário autenticado (comentários relacionados são removidos em cascata).
 
 ### 4.3 Fluxo de status
 
@@ -164,7 +164,7 @@ Lista comentários da tarefa pertencente ao usuário autenticado (sem paginaçã
 **POST /api/tarefas/<tarefa_pk>/comentarios/**  
 Cria comentário para a tarefa:
 
-- campo `texto` obrigatório, nǜo pode ser vazio e tem limite de 1.000 caracteres;
+- campo `texto` obrigatório, não pode ser vazio e tem limite de 1.000 caracteres;
 - `usuario` e `tarefa` sǜo preenchidos automaticamente a partir do `request` e da URL.
 
 Regras de segurança:
@@ -228,7 +228,7 @@ docker-compose run --rm backend coverage report
 Escopo coberto pelos testes:
 
 - Autenticação: registro, login e erros de validação;
-- Endpoint `/api/auth/me/` (usuǭrio + perfil);
+- Endpoint `/api/auth/me/` (usuário + perfil);
 - CRUD de tarefas e fluxo de status (incluindo transições inválidas);
 - Dashboard de tarefas;
 - Validações de `TarefaSerializer` e `UsuarioRegisterSerializer`;
@@ -248,10 +248,10 @@ Alguns pontos propositalmente simplificados ou ainda não endereçados:
 - Atribuição de tarefas (UI): a atribuição é feita via `prompt` solicitando e-mail; uma evolução possível seria adicionar um campo dedicado com autocomplete ou seleção de usuários disponíveis;
 - Gestão de comentários: não há edição ou exclusão de comentários, apenas criação e listagem;
 - Testes de frontend: o foco de cobertura ficou no backend; não foram incluídos testes unitários ou de ponta a ponta no frontend;
-- Internacionalização e acentuação: os textos estão em portuguǦs simples, sem tratamento de i18n; em alguns pontos, acentos podem apresentar problemas de encoding;
+- Internacionalização e acentuação: os textos estão em português simples, sem tratamento de i18n; em alguns pontos, acentos podem apresentar problemas de encoding;
 - Segurança avançada: não há mecanismos de throttling, redefinição de senha, verificação de e-mail ou políticas de senha mais elaboradas.
 
-Apesar desses pontos, o nǧcleo funcional do desafio (autenticação, tarefas, fluxo de status, dashboard, comentários, atribuição e favoritos no cliente) está implementado e coberto por testes no backend.
+Apesar desses pontos, o núcleo funcional do desafio (autenticação, tarefas, fluxo de status, dashboard, comentários, atribuição e favoritos no cliente) está implementado e coberto por testes no backend.
 
 ---
 
