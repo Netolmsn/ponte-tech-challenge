@@ -109,8 +109,8 @@ class TarefaTests(APITestCase):
         response = self.client.get("/api/tarefas/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["titulo"], "Tarefa pendente")
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['titulo'], 'Tarefa pendente')
 
     def test_fluxo_status_valido_pendente_para_em_andamento(self) -> None:
         url = f"/api/tarefas/{self.tarefa.id}/"

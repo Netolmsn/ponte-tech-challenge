@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import Tarefa, UsuarioPerfil
+from .models import Comentario, Tarefa, UsuarioPerfil
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -127,3 +127,23 @@ class TarefaSerializer(serializers.ModelSerializer):
 
         return attrs
 
+
+class ComentarioSerializer(serializers.ModelSerializer):
+    usuario = serializers.ReadOnlyField(source="usuario.id")
+
+    class Meta:
+        model = Comentario
+        fields = ["id", "tarefa", "usuario", "texto", "criado_em"]
+        read_only_fields = ["id", "tarefa", "usuario", "criado_em"]
+
+    def validate_texto(self, value: str) -> str:
+        texto = value.strip()
+        if not texto:
+            raise serializers.ValidationError(
+                "Texto do comentário não pode ser vazio."
+            )
+        if len(texto) > 1000:
+            raise serializers.ValidationError(
+                "Texto do comentário deve ter no máximo 1000 caracteres."
+            )
+        return texto

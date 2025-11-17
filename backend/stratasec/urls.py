@@ -7,7 +7,14 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from tarefas.views import DashboardView, LoginView, MeView, RegisterView, TarefaViewSet
+from tarefas.views import (
+    ComentarioListCreateView,
+    DashboardView,
+    LoginView,
+    MeView,
+    RegisterView,
+    TarefaViewSet,
+)
 
 
 def root_redirect(_request):
@@ -37,4 +44,9 @@ urlpatterns = [
     path("api/auth/register/", RegisterView.as_view(), name="auth_register"),
     path("api/auth/login/", LoginView.as_view(), name="auth_login"),
     path("api/dashboard/", DashboardView.as_view(), name="dashboard"),
+    path(
+        "api/tarefas/<int:tarefa_pk>/comentarios/",
+        ComentarioListCreateView.as_view(),
+        name="tarefa_comentarios",
+    ),
 ]
