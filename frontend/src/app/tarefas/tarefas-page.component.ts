@@ -5,13 +5,15 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { finalize } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
 
 interface Tarefa {
   id: number;
@@ -41,6 +43,7 @@ interface DashboardResponse {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatSnackBarModule,
     NgChartsModule,
   ],
@@ -57,6 +60,7 @@ export class TarefasPageComponent implements OnInit {
 
   tarefas: Tarefa[] = [];
   dashboard: DashboardResponse | null = null;
+
   saving = false;
   loadingTarefas = false;
   loadingDashboard = false;
@@ -65,21 +69,65 @@ export class TarefasPageComponent implements OnInit {
   page = 1;
   pageSize = 10;
   pageSizeOptions = [5, 10, 50];
+  searchTerm = '';
 
   filtroStatus: string | null = null;
   filtroPrioridade: string | null = null;
 
   editingId: number | null = null;
   private originalStatusMap = new Map<number, Tarefa['status']>();
-
   ordenacaoAsc = false;
 
   tarefaForm = this.fb.group({
-    titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-    descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+    titulo: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100),
+      ],
+    ],
+    descricao: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500),
+      ],
+    ],
     status: ['PENDENTE', Validators.required],
     prioridade: ['MEDIA', Validators.required],
   });
+
+  // Chart.js (ng2-charts) configs para gráfico de status
+  public statusChartType: ChartType = 'doughnut';
+
+  public statusChartData: ChartConfiguration['data'] = {
+    labels: ['Pendente', 'Em progresso', 'Concluída'],
+    datasets: [
+      {
+        data: [0, 0, 0],
+        backgroundColor: ['#FACC15', '#3B82F6', '#22C55E'],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  public statusChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#333333',
+          font: {
+            size: 13,
+          },
+        },
+      },
+    },
+  };
 
   ngOnInit(): void {
     this.carregarTarefas();
@@ -87,16 +135,20 @@ export class TarefasPageComponent implements OnInit {
   }
 
   carregarTarefas(): void {
-    const params: any = {};
+    const params: any = {
+      page: this.page,
+      page_size: this.pageSize,
+    };
+
     if (this.filtroStatus) {
       params.status = this.filtroStatus;
     }
     if (this.filtroPrioridade) {
       params.prioridade = this.filtroPrioridade;
     }
-
-    params.page = this.page;
-    params.page_size = this.pageSize;
+    if (this.searchTerm && this.searchTerm.trim()) {
+      params.search = this.searchTerm.trim();
+    }
 
     this.loadingTarefas = true;
 
@@ -120,6 +172,14 @@ export class TarefasPageComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao carregar tarefas', err);
+
+          // Caso comum: página ficou inválida após apagar a última tarefa dela.
+          if (err?.status === 404 && this.page > 1) {
+            this.page = 1;
+            this.carregarTarefas();
+            return;
+          }
+
           this.snackBar.open('Erro ao carregar tarefas', 'Fechar', {
             duration: 3000,
           });
@@ -129,6 +189,7 @@ export class TarefasPageComponent implements OnInit {
 
   carregarDashboard(): void {
     this.loadingDashboard = true;
+
     this.http
       .get<DashboardResponse>(`${this.apiUrl}/dashboard/`)
       .pipe(
@@ -157,6 +218,7 @@ export class TarefasPageComponent implements OnInit {
   limparFiltros(): void {
     this.filtroStatus = null;
     this.filtroPrioridade = null;
+    this.searchTerm = '';
     this.page = 1;
     this.aplicarFiltros();
   }
@@ -186,7 +248,7 @@ export class TarefasPageComponent implements OnInit {
 
   cancelarEdicao(): void {
     this.editingId = null;
-      this.tarefaForm.reset({
+    this.tarefaForm.reset({
       titulo: '',
       descricao: '',
       status: 'PENDENTE',
@@ -232,6 +294,7 @@ export class TarefasPageComponent implements OnInit {
           payload.status as Tarefa['status'],
         )
       ) {
+        this.saving = false;
         this.snackBar.open(
           'Fluxo de status inválido para esta tarefa.',
           'Fechar',
@@ -299,11 +362,23 @@ export class TarefasPageComponent implements OnInit {
 
     this.http
       .delete(`${this.apiUrl}/tarefas/${tarefa.id}/`)
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: () => {
           this.snackBar.open('Tarefa excluída', 'Fechar', {
             duration: 3000,
           });
+
+          // Se acabamos de excluir a única tarefa da página atual,
+          // voltamos para a página anterior para evitar erro 404.
+          if (this.tarefas.length <= 1 && this.page > 1) {
+            this.page -= 1;
+          }
+
           this.carregarTarefas();
           this.carregarDashboard();
         },
@@ -312,6 +387,46 @@ export class TarefasPageComponent implements OnInit {
           this.snackBar.open('Erro ao excluir tarefa', 'Fechar', {
             duration: 3000,
           });
+        },
+      });
+  }
+
+  atribuirTarefa(tarefa: Tarefa): void {
+    const email = prompt(
+      'Digite o e-mail do usuário para atribuir esta tarefa:',
+    );
+
+    const trimmed = email?.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    this.http
+      .post<Tarefa>(`${this.apiUrl}/tarefas/${tarefa.id}/atribuir/`, {
+        email: trimmed,
+      })
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Tarefa atribuída com sucesso', 'Fechar', {
+            duration: 3000,
+          });
+          this.carregarTarefas();
+          this.carregarDashboard();
+        },
+        error: (err) => {
+          console.error('Erro ao atribuir tarefa', err);
+          const backendMessage =
+            (err?.error && (err.error.email || err.error.detail)) ?? null;
+          this.snackBar.open(
+            backendMessage || 'Erro ao atribuir tarefa',
+            'Fechar',
+            { duration: 3000 },
+          );
         },
       });
   }
@@ -394,36 +509,6 @@ export class TarefasPageComponent implements OnInit {
         return 'task-border-default';
     }
   }
-
-  // Chart.js (ng2-charts) configs para gráfico de status
-  public statusChartType: ChartType = 'doughnut';
-
-  public statusChartData: ChartConfiguration['data'] = {
-    labels: ['Pendente', 'Em progresso', 'Concluída'],
-    datasets: [
-      {
-        data: [0, 0, 0],
-        backgroundColor: ['#FACC15', '#3B82F6', '#22C55E'],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  public statusChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#333333',
-          font: {
-            size: 13,
-          },
-        },
-      },
-    },
-  };
 
   private updateChartFromDashboard(): void {
     const pend = this.pendingCount;

@@ -1,4 +1,4 @@
-# StrataSec Backend (Django)
+# Backend (Django)
 
 Instrucoes especificas do backend e configuracao de CORS/JWT.
 

@@ -56,3 +56,24 @@ class Tarefa(models.Model):
     def __str__(self):
         return f"{self.titulo} ({self.get_status_display()})"
 
+
+class Comentario(models.Model):
+    tarefa = models.ForeignKey(
+        Tarefa,
+        on_delete=models.CASCADE,
+        related_name="comentarios",
+    )
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="comentarios",
+    )
+    texto = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "comentario"
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"Comentário de {self.usuario_id} na tarefa {self.tarefa_id}"

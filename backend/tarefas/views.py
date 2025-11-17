@@ -1,13 +1,16 @@
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
-from rest_framework import serializers, status, viewsets
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, serializers, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Tarefa
+from .models import Comentario, Tarefa
 from .serializers import (
+    ComentarioSerializer,
     TarefaSerializer,
     UserSerializer,
     UsuarioPerfilSerializer,
@@ -126,6 +129,29 @@ class TarefaViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
 
+    @action(detail=True, methods=["post"], url_path="atribuir")
+    def atribuir(self, request, pk=None):
+        tarefa = self.get_object()
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {"email": "Este campo é obrigatório."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            novo_usuario = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
+            return Response(
+                {"email": "Usuário não encontrado."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        tarefa.usuario = novo_usuario
+        tarefa.save(update_fields=["usuario"])
+
+        return Response(TarefaSerializer(tarefa).data)
+
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -146,3 +172,21 @@ class DashboardView(APIView):
                 "por_status": {item["status"]: item["total"] for item in por_status},
             }
         )
+
+
+class ComentarioListCreateView(generics.ListCreateAPIView):
+    serializer_class = ComentarioSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+    def get_queryset(self):
+        tarefa_id = self.kwargs.get("tarefa_pk")
+        return Comentario.objects.filter(
+            tarefa__id=tarefa_id,
+            tarefa__usuario=self.request.user,
+        ).order_by("-criado_em")
+
+    def perform_create(self, serializer):
+        tarefa_id = self.kwargs.get("tarefa_pk")
+        tarefa = get_object_or_404(Tarefa, id=tarefa_id, usuario=self.request.user)
+        serializer.save(usuario=self.request.user, tarefa=tarefa)
